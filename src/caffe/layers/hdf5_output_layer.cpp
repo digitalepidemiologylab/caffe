@@ -29,12 +29,21 @@ HDF5OutputLayer<Dtype>::~HDF5OutputLayer<Dtype>() {
 template <typename Dtype>
 void HDF5OutputLayer<Dtype>::SaveBlobs() {
   // TODO: no limit on the number of blobs
-  LOG(INFO) << "Saving HDF5 file " << file_name_;
+  LOG(INFO) << "Saving HDF5 file " << file_name_ << " Iteration :" << iteration_number_;
   CHECK_EQ(data_blob_.num(), label_blob_.num()) <<
       "data blob and label blob must have the same batch size";
-  hdf5_save_nd_dataset(file_id_, HDF5_DATA_DATASET_NAME, data_blob_);
-  hdf5_save_nd_dataset(file_id_, HDF5_DATA_LABEL_NAME, label_blob_);
+  ostringstream _hdf5_data_dataset_name;
+  _hdf5_data_dataset_name << HDF5_DATA_DATASET_NAME << "__" << iteration_number_;
+  
+  hdf5_save_nd_dataset(file_id_, _hdf5_data_dataset_name.str(), data_blob_);
+
+  ostringstream _hdf5_data_label_name;
+  _hdf5_data_label_name << HDF5_DATA_LABEL_NAME << "__" << iteration_number_;
+  
+  hdf5_save_nd_dataset(file_id_, _hdf5_data_label_name.str(), label_blob_);
   LOG(INFO) << "Successfully saved " << data_blob_.num() << " rows";
+  
+  iteration_number_++;
 }
 
 template <typename Dtype>
